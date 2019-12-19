@@ -19,105 +19,88 @@ class OtterApi {
 
     if (!email || !password) {
       throw new Error(
-        "Email and/or password were not given. Can't perform authentication",
+        "Email and/or password were not given. Can't perform authentication to otter.ai",
       );
     }
+    const csrfResponse = await axios({
+      method: 'GET',
+      url: `${API_BASE_URL}/login_csrf`,
+    });
+    const {
+      cookieValue: csrfToken,
+      cookieHeader: csrfCookie,
+    } = getCookieValueAndHeader(
+      csrfResponse.headers['set-cookie'][0],
+      CSRF_COOKIE_NAME,
+    );
 
-    try {
-      const csrfResponse = await axios({
-        method: 'GET',
-        url: `${API_BASE_URL}/login_csrf`,
-      });
-      const {
-        cookieValue: csrfToken,
-        cookieHeader: csrfCookie,
-      } = getCookieValueAndHeader(
-        csrfResponse.headers['set-cookie'][0],
-        CSRF_COOKIE_NAME,
-      );
+    const response = await axios({
+      method: 'GET',
+      url: `${API_BASE_URL}/login`,
+      params: {
+        username: email,
+      },
+      headers: {
+        authorization: `Basic ${Buffer.from(`${email}:${password}`).toString(
+          'base64',
+        )}`,
+        'x-csrftoken': csrfToken,
+        cookie: csrfCookie,
+      },
+      withCredentials: true,
+    });
 
-      const response = await axios({
-        method: 'GET',
-        url: `${API_BASE_URL}/login`,
-        params: {
-          username: email,
-        },
-        headers: {
-          authorization: `Basic ${Buffer.from(`${email}:${password}`).toString(
-            'base64',
-          )}`,
-          'x-csrftoken': csrfToken,
-          cookie: csrfCookie,
-        },
-        withCredentials: true,
-      });
+    const cookieHeader = `${response.headers['set-cookie'][0]}; ${response.headers['set-cookie'][1]}`;
+    ({ cookieValue: this.csrfToken } = getCookieValueAndHeader(
+      response.headers['set-cookie'][0],
+      CSRF_COOKIE_NAME,
+    ));
 
-      const cookieHeader = `${response.headers['set-cookie'][0]}; ${response.headers['set-cookie'][1]}`;
-      ({ cookieValue: this.csrfToken } = getCookieValueAndHeader(
-        response.headers['set-cookie'][0],
-        CSRF_COOKIE_NAME,
-      ));
+    this.user = response.data.user;
 
-      this.user = response.data.user;
+    axios.defaults.headers.common.cookie = cookieHeader;
 
-      axios.defaults.headers.common.cookie = cookieHeader;
+    console.log('Successfuly logged in to Otter.ai');
 
-      console.log('Successfuly logged in to Otter.ai');
-
-      return response;
-    } catch (err) {
-      throw new Error(err);
-    }
+    return response;
   };
 
   getSpeeches = async () => {
-    try {
-      const { data } = await axios({
-        method: 'GET',
-        url: `${API_BASE_URL}/speeches`,
-        params: {
-          userid: this.user.id,
-        },
-      });
+    const { data } = await axios({
+      method: 'GET',
+      url: `${API_BASE_URL}/speeches`,
+      params: {
+        userid: this.user.id,
+      },
+    });
 
-      return data.speeches;
-    } catch (err) {
-      throw new Error(err);
-    }
+    return data.speeches;
   };
 
   getSpeech = async speech_id => {
-    try {
-      const { data } = await axios({
-        method: 'GET',
-        url: `${API_BASE_URL}/speech`,
-        params: {
-          speech_id,
-          userid: this.user.id,
-        },
-      });
+    const { data } = await axios({
+      method: 'GET',
+      url: `${API_BASE_URL}/speech`,
+      params: {
+        speech_id,
+        userid: this.user.id,
+      },
+    });
 
-      return data.speech;
-    } catch (err) {
-      throw new Error(err);
-    }
+    return data.speech;
   };
 
   speechSearch = async query => {
-    try {
-      const { data } = await axios({
-        method: 'GET',
-        url: `${API_BASE_URL}/speech_search`,
-        params: {
-          query,
-          userid: this.user.id,
-        },
-      });
+    const { data } = await axios({
+      method: 'GET',
+      url: `${API_BASE_URL}/speech_search`,
+      params: {
+        query,
+        userid: this.user.id,
+      },
+    });
 
-      return data.hits;
-    } catch (err) {
-      throw new Error(err);
-    }
+    return data.hits;
   };
 
   validateUploadService = () =>
