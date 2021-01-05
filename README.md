@@ -37,7 +37,7 @@ Receive an array of all user speeches
 **Method**:
 
 ```js
-otterApi.getSpeeches();
+await otterApi.getSpeeches();
 ```
 
 **Response**:
@@ -88,7 +88,7 @@ Receive an object of a particular speech
 **Method**:
 
 ```js
-otterApi.getSpeech(speechId);
+await otterApi.getSpeech(speechId);
 ```
 
 **Parameters**:
@@ -129,7 +129,7 @@ Receive an array of search results given a particular query
 **Method**:
 
 ```js
-otterApi.speechSearch(query);
+await otterApi.speechSearch(query);
 ```
 
 **Parameters**:
