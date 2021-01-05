@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/omerdn1/otter-api#readme",
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
     "xml2js": "^0.4.22"
