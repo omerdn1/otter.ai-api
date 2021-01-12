@@ -11,8 +11,11 @@ class OtterApi {
     this.options = options;
     this.user = {};
     this.csrfToken = '';
-    this.#login();
   }
+
+  init = async () => {
+    await this.#login();
+  };
 
   #login = async () => {
     const { email, password } = this.options;

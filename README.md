@@ -26,6 +26,8 @@ const otterApi = new OtterApi({
   email: 'email@example.com', // Your otter.ai email
   password: 'abc123!#', // Your otter.ai password
 });
+
+await otterApi.init() // Performs login
 ```
 
 ## Methods
